@@ -141,11 +141,16 @@ public class UserController {
         if (fetchedOTP == null) {
             return new ResponseEntity<>("Please login again using Email and Password", HttpStatus.UNAUTHORIZED);
         }
+        if (new Date().after(fetchedOTP.getExpiryDate())) {
+            return new ResponseEntity<>("OTP has expired", HttpStatus.UNAUTHORIZED);
+        }
         if (Objects.equals(fetchedOTP.getOtp(), otp)) {
             String jwtToken = jwtUtility.generateToken(email);
             Map<String, Object> response = new HashMap<>();
             response.put("token", jwtToken);
             response.put("message", "Signed in successfully!");
+            fetchedOTP.setExpiryDate(new Date());
+            otPsRepository.save(fetchedOTP);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>("Incorrect OTP", HttpStatus.UNAUTHORIZED);
