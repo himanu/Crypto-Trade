@@ -18,7 +18,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/login", "/signup").permitAll()
+                        .requestMatchers("/login", "/signup", "/opt_verify").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class)
