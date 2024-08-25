@@ -1,5 +1,6 @@
 package com.example.trade.controllers;
 
+import com.example.trade.domain.Endpoints;
 import com.example.trade.domain.JwtUtility;
 import com.example.trade.domain.VERIFICATION_TYPE;
 import com.example.trade.entities.OTPs;
@@ -39,7 +40,7 @@ public class UserController {
     @Autowired
     OTPsRepository otPsRepository;
 
-    @PostMapping("/login")
+    @PostMapping(Endpoints.login)
     ResponseEntity<Object> login(@RequestBody User user) {
         String email = user.getEmail();
         String password = user.getPassword();
@@ -99,7 +100,7 @@ public class UserController {
         return otpEntity;
     }
 
-    @PostMapping("/signup")
+    @PostMapping(Endpoints.signup)
     ResponseEntity<Object> signup(@RequestBody User user) throws Exception {
         String email = user.getEmail();
         String password = user.getPassword();
@@ -121,7 +122,7 @@ public class UserController {
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
-    @PutMapping("/enable_2fa")
+    @PutMapping(Endpoints.enable2FA)
     ResponseEntity<Object> enable2FA() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
@@ -134,7 +135,7 @@ public class UserController {
         return new ResponseEntity<>("Enabled Two Factor Auth", HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/opt_verify")
+    @PostMapping(Endpoints.otpVerify)
     ResponseEntity<Object> verifyOTP(@RequestParam String otp, @RequestParam String email) {
         User fetchedUser = userRepository.findByEmail(email);
         OTPs fetchedOTP = otPsRepository.findByUser(fetchedUser);
@@ -156,7 +157,7 @@ public class UserController {
         return new ResponseEntity<>("Incorrect OTP", HttpStatus.UNAUTHORIZED);
     }
 
-    @GetMapping("/get_user")
+    @GetMapping(Endpoints.getUser)
     ResponseEntity<Object> getUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
