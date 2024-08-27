@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+// Create buckets for rate limiting
 @Configuration
 public class RateLimitingConfig {
 

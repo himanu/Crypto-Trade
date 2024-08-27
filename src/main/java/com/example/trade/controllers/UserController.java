@@ -2,6 +2,7 @@ package com.example.trade.controllers;
 
 import com.example.trade.domain.Endpoints;
 import com.example.trade.domain.JwtUtility;
+import com.example.trade.domain.OTPType;
 import com.example.trade.domain.VERIFICATION_TYPE;
 import com.example.trade.entities.OTPs;
 import com.example.trade.entities.TwoFactorAuth;
@@ -53,12 +54,11 @@ public class UserController {
 
         if (passwordEncoder.matches(password, fetchedUser.getPassword())) {
             if (fetchedUser.getTwoFactorAuth().isEnabled()) {
-                OTPs fetchedOTP = otPsRepository.findByUser(fetchedUser);
-                if (fetchedOTP != null)
-                    otPsRepository.deleteById(fetchedOTP.getId());
+//                Before sending a fresh otp, delete the existing one
+                Optional<OTPs> fetchedOTP = otPsRepository.findByUserAndOtpType(fetchedUser, OTPType.LOGIN);
+                fetchedOTP.ifPresent(otPs -> otPsRepository.deleteById(otPs.getId()));
 
-                OTPs savedOTP = this.createOtp();
-                savedOTP.setUser(fetchedUser);
+                OTPs savedOTP = this.createOtp(fetchedUser, OTPType.LOGIN);
                 otPsRepository.save(savedOTP);
 
                 this.sendEmail(email, "OTP to login to your account", "Your OTP is \n" + savedOTP.getOtp());
@@ -82,7 +82,7 @@ public class UserController {
         javaMailSender.send(message);
     }
 
-    public OTPs createOtp() {
+    public OTPs createOtp(User user, OTPType otpType) {
         Random random = new Random();
         int otp = 100000 + random.nextInt(900000);
         // Current time
@@ -96,7 +96,8 @@ public class UserController {
         otpEntity.setOtp(String.valueOf(otp));
         otpEntity.setCreatedDate(Date.from(now));
         otpEntity.setExpiryDate(Date.from(expiryTime));
-
+        otpEntity.setUser(user);
+        otpEntity.setOtpType(otpType);
         return otpEntity;
     }
 
@@ -138,20 +139,20 @@ public class UserController {
     @PostMapping(Endpoints.otpVerify)
     ResponseEntity<Object> verifyOTP(@RequestParam String otp, @RequestParam String email) {
         User fetchedUser = userRepository.findByEmail(email);
-        OTPs fetchedOTP = otPsRepository.findByUser(fetchedUser);
-        if (fetchedOTP == null) {
+        Optional<OTPs> fetchedOTP = otPsRepository.findByUserAndOtpType(fetchedUser, OTPType.LOGIN);
+        if (fetchedOTP.isEmpty()) {
             return new ResponseEntity<>("Please login again using Email and Password", HttpStatus.UNAUTHORIZED);
         }
-        if (new Date().after(fetchedOTP.getExpiryDate())) {
+        OTPs fetchedOTP1 = fetchedOTP.get();
+        if (new Date().after(fetchedOTP1.getExpiryDate())) {
             return new ResponseEntity<>("OTP has expired", HttpStatus.UNAUTHORIZED);
         }
-        if (Objects.equals(fetchedOTP.getOtp(), otp)) {
+        if (Objects.equals(fetchedOTP1.getOtp(), otp)) {
             String jwtToken = jwtUtility.generateToken(email);
             Map<String, Object> response = new HashMap<>();
             response.put("token", jwtToken);
             response.put("message", "Signed in successfully!");
-            fetchedOTP.setExpiryDate(new Date());
-            otPsRepository.save(fetchedOTP);
+            otPsRepository.deleteById(fetchedOTP1.getId());
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>("Incorrect OTP", HttpStatus.UNAUTHORIZED);
