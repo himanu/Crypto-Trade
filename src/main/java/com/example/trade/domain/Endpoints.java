@@ -10,6 +10,7 @@ public class Endpoints {
     public static final String otpVerify = "/opt_verify";
     public static final String getUser = "/get_user";
     public static final String initResetPassword = "/init_reset_password";
+    public static final String setNewPassword = "/set_new_password";
     public static  Map<String, Boolean> privateEndpoint = new HashMap<>();
 
     static {
@@ -19,5 +20,6 @@ public class Endpoints {
         privateEndpoint.put(otpVerify, false);
         privateEndpoint.put(getUser, true);
         privateEndpoint.put(initResetPassword, false);
+        privateEndpoint.put(setNewPassword, false);
     }
 }

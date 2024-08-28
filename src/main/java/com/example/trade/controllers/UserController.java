@@ -1,5 +1,6 @@
 package com.example.trade.controllers;
 
+import com.example.trade.DTOs.SetNewPasswordReq;
 import com.example.trade.domain.Endpoints;
 import com.example.trade.domain.JwtUtility;
 import com.example.trade.domain.OTPType;
@@ -188,4 +189,29 @@ public class UserController {
         }
     }
 
+    @PostMapping(Endpoints.setNewPassword)
+    ResponseEntity<Object> setNewPassword(@RequestBody SetNewPasswordReq body) {
+
+        if (body.otp == null || body.email == null || body.newPassword == null || body.email.isBlank() || body.otp.isBlank() || body.newPassword.isBlank()) {
+            return new ResponseEntity<>("Missing Email or OTP or Password!", HttpStatus.FORBIDDEN);
+        }
+
+        User user = userRepository.findByEmail(body.email);
+        if (user == null) {
+            return new ResponseEntity<>("Invalid Email", HttpStatus.FORBIDDEN);
+        }
+        Optional<OTPs> storedOtp = otPsRepository.findByUserAndOtpType(user, OTPType.RESET_PASSWORD);
+        if (storedOtp.isEmpty())
+            return new ResponseEntity<>("Invalid OTP", HttpStatus.FORBIDDEN);
+        if (storedOtp.get().getExpiryDate().before(new Date())) {
+            return new ResponseEntity<>("OTP is Expired", HttpStatus.FORBIDDEN);
+        }
+        if (storedOtp.get().getOtp().matches(body.otp)) {
+            otPsRepository.deleteById(storedOtp.get().getId());
+            user.setPassword(passwordEncoder.encode(body.newPassword));
+            userRepository.save(user);
+            return new ResponseEntity<>("Successfully reset the password", HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>("Incorrect OTP", HttpStatus.FORBIDDEN);
+    }
 }

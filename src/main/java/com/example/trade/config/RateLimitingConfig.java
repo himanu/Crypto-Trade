@@ -24,6 +24,7 @@ public class RateLimitingConfig {
         buckets.put(Endpoints.signup, createBucket(10, 10));
         buckets.put(Endpoints.otpVerify, createBucket(10, 10));
         buckets.put(Endpoints.initResetPassword, createBucket(10, 10));
+        buckets.put(Endpoints.setNewPassword, createBucket(10, 10));
         return buckets;
     }
 
