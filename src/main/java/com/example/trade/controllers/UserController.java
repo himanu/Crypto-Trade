@@ -165,4 +165,27 @@ public class UserController {
         User user = userRepository.findByEmail(email);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+
+    @PutMapping(Endpoints.initResetPassword)
+    ResponseEntity<Object> initResetPassword(@RequestParam String email) {
+        try {
+            if (email.isEmpty()) {
+                return new ResponseEntity<>("Missing Email in requests", HttpStatus.FORBIDDEN);
+            }
+            User user = userRepository.findByEmail(email);
+
+            if (user == null) {
+                return new ResponseEntity<>("User not found", HttpStatus.FORBIDDEN);
+            }
+            otPsRepository.deleteByUserAndOtpType(user, OTPType.RESET_PASSWORD);
+            OTPs otp = this.createOtp(user, OTPType.RESET_PASSWORD);
+            otPsRepository.save(otp);
+            this.sendEmail(email, "OTP to Reset your Password", "Your OTP is \n" + otp.getOtp());
+            return new ResponseEntity<>("OTP is sent!", HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>("Something Went Wrong!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

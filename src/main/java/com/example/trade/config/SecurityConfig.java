@@ -1,5 +1,6 @@
 package com.example.trade.config;
 
+import com.example.trade.domain.Endpoints;
 import com.example.trade.domain.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/login", "/signup", "/opt_verify").permitAll()
+                        .requestMatchers(Endpoints.login, Endpoints.signup, Endpoints.otpVerify, Endpoints.initResetPassword).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class)

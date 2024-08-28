@@ -45,8 +45,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 response.setStatus(429);
                 return;
             }
+            System.out.println("Request is here");
+            // for public endpoints we don't need to test authentication
             if (!Endpoints.privateEndpoint.get(url)) {
-                // for public endpoints we don't need to test authentication
+                System.out.println("Request is public");
                 filterChain.doFilter(request, response);
                 return;
             }
