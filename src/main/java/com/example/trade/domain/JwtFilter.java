@@ -68,6 +68,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             response.setStatus(401);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             response.setStatus(401);
         }
     }

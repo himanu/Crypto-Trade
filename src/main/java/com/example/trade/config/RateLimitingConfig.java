@@ -25,6 +25,12 @@ public class RateLimitingConfig {
         buckets.put(Endpoints.otpVerify, createBucket(10, 10));
         buckets.put(Endpoints.initResetPassword, createBucket(10, 10));
         buckets.put(Endpoints.setNewPassword, createBucket(10, 10));
+        buckets.put(Endpoints.getCoins, createBucket(10, 10));
+        buckets.put(Endpoints.getMarketChart, createBucket(10, 10));
+        buckets.put(Endpoints.getCoinDetails, createBucket(10, 10));
+        buckets.put(Endpoints.searchCoin, createBucket(10, 10));
+        buckets.put(Endpoints.trendingCoins, createBucket(10, 10));
+        buckets.put(Endpoints.top50Coin, createBucket(10, 10));
         return buckets;
     }
 
