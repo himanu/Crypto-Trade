@@ -31,6 +31,13 @@ public class RateLimitingConfig {
         buckets.put(Endpoints.searchCoin, createBucket(10, 10));
         buckets.put(Endpoints.trendingCoins, createBucket(10, 10));
         buckets.put(Endpoints.top50Coin, createBucket(10, 10));
+        buckets.put(Endpoints.createOrder, createBucket(10, 10));
+        buckets.put(Endpoints.orderHistory, createBucket(10, 10));
+        buckets.put(Endpoints.getPortfolio, createBucket(10, 10));
+        buckets.put(Endpoints.addMoney, createBucket(10, 10));
+        buckets.put(Endpoints.withdrawMoney, createBucket(10, 10));
+        buckets.put(Endpoints.getBalance, createBucket(10, 10));
+        buckets.put(Endpoints.createWallet, createBucket(10, 10));
         return buckets;
     }
 

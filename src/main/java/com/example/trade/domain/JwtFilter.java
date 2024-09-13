@@ -2,12 +2,14 @@ package com.example.trade.domain;
 
 import com.example.trade.entities.User;
 import com.example.trade.repositories.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,13 +64,23 @@ public class JwtFilter extends OncePerRequestFilter {
                             new ArrayList<>()
                     );
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    filterChain.doFilter(request, response);
+                    try {
+                        filterChain.doFilter(request, response);
+                    } catch(Exception e) {
+                        response.setStatus(500);
+                        response.setContentType("application/json");
+                        ErrorMessage errorMessage = new ErrorMessage();
+                        errorMessage.setMessage(e.getMessage());
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        String jsonResponse = objectMapper.writeValueAsString(errorMessage);
+                        response.getWriter().write(jsonResponse);
+                    }
                     return;
                 }
             }
             response.setStatus(401);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Catch error" + e.getMessage());
             response.setStatus(401);
         }
     }

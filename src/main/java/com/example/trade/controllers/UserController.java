@@ -1,6 +1,8 @@
 package com.example.trade.controllers;
 
 import com.example.trade.DTOs.SetNewPasswordReq;
+import com.example.trade.Services.UserService;
+import com.example.trade.Services.WalletService;
 import com.example.trade.domain.Endpoints;
 import com.example.trade.domain.JwtUtility;
 import com.example.trade.domain.OTPType;
@@ -30,6 +32,12 @@ import java.util.*;
 public class UserController {
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    WalletService walletService;
 
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -121,6 +129,7 @@ public class UserController {
         newUser.setPassword(passwordEncoder.encode(password));
         newUser.setUsername(username);
         User savedUser = userRepository.save(newUser);
+        walletService.createWallet(savedUser);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
@@ -161,9 +170,7 @@ public class UserController {
 
     @GetMapping(Endpoints.getUser)
     ResponseEntity<Object> getUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        User user = userRepository.findByEmail(email);
+        User user = userService.getUser();
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 

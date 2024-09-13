@@ -2,6 +2,7 @@ package com.example.trade.Services;
 
 import com.example.trade.entities.Coin;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -104,5 +105,12 @@ public class CoinServiceImpl implements CoinService{
         HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
         ResponseEntity<String> coinsResponse = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
         return coinsResponse.getBody();
+    }
+
+    public double getCoinLatestPrize(String coinId) throws JsonProcessingException {
+        String coinDetail = getCoinDetails(coinId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode =  objectMapper.readTree(coinDetail);
+        return jsonNode.get("market_data").get("current_price").get("usd").asDouble();
     }
 }

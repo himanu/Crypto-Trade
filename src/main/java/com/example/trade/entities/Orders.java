@@ -2,14 +2,14 @@ package com.example.trade.entities;
 
 import com.example.trade.domain.OrderStatus;
 import com.example.trade.domain.OrderType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Entity
+@Data
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -18,6 +18,7 @@ public class Orders {
     @ManyToOne
     User user;
 
+    @Enumerated(EnumType.STRING)
     OrderType orderType;
 
     String coinId;
@@ -28,5 +29,8 @@ public class Orders {
 
     BigDecimal txnPrice;
 
+    @Enumerated(EnumType.STRING)
     OrderStatus orderStatus;
+
+    String remark;
 }
