@@ -44,4 +44,10 @@ public class WalletController {
         Wallet wallet = walletService.createWallet(user);
         return new ResponseEntity<>(wallet, HttpStatus.CREATED);
     }
+    @GetMapping(Endpoints.getWallet)
+    ResponseEntity<Wallet> getWallet() {
+        User user = userService.getUser();
+        Wallet wallet = walletService.getUserWallet(user);
+        return new ResponseEntity<>(wallet, HttpStatus.OK);
+    }
 }

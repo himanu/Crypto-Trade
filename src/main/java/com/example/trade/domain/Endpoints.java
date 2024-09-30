@@ -24,6 +24,7 @@ public class Endpoints {
     public static final String withdrawMoney = "/wallet/withdraw";
     public static final String getBalance = "/wallet/balance";
     public static final String createWallet = "/wallet/create";
+    public static final String getWallet = "/wallet";
     public static final String helloWorld = "/";
     public static  Map<String, Boolean> privateEndpoint = new HashMap<>();
 
@@ -49,5 +50,6 @@ public class Endpoints {
         privateEndpoint.put(getBalance, true);
         privateEndpoint.put(createWallet, true);
         privateEndpoint.put(helloWorld, false);
+        privateEndpoint.put(getWallet, true);
     }
 }

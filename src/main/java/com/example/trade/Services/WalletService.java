@@ -70,5 +70,9 @@ public class WalletService {
         walletTxnRepository.save(walletTxns);
     }
 
+    public Wallet getUserWallet(User user) {
+        return walletRepository.findByUser(user);
+    }
+
 
 }
