@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class General {
     @GetMapping("/")
     String helloWorld() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return "Hello! " + auth.getName();
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return "Hello! ";
     }
 }
