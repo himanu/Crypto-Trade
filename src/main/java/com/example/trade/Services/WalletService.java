@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -74,5 +75,9 @@ public class WalletService {
         return walletRepository.findByUser(user);
     }
 
+    public List<WalletTxns> getWalletTxns(User user) {
+        Wallet wallet = getUserWallet(user);
+        return walletTxnRepository.findByWallet(wallet);
+    }
 
 }

@@ -8,6 +8,7 @@ import com.example.trade.domain.OrderType;
 import com.example.trade.entities.Orders;
 import com.example.trade.entities.User;
 import com.example.trade.entities.Wallet;
+import com.example.trade.entities.WalletTxns;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 public class WalletController {
@@ -49,5 +51,12 @@ public class WalletController {
         User user = userService.getUser();
         Wallet wallet = walletService.getUserWallet(user);
         return new ResponseEntity<>(wallet, HttpStatus.OK);
+    }
+
+    @GetMapping(Endpoints.getWalletTxns)
+    ResponseEntity<List<WalletTxns>> getWalletTxns() {
+        User user = userService.getUser();
+        List<WalletTxns> txns = walletService.getWalletTxns(user);
+        return new ResponseEntity<>(txns, HttpStatus.OK);
     }
 }

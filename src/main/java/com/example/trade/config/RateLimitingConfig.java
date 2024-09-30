@@ -39,6 +39,7 @@ public class RateLimitingConfig {
         buckets.put(Endpoints.getBalance, createBucket(100, 10));
         buckets.put(Endpoints.createWallet, createBucket(100, 10));
         buckets.put(Endpoints.getWallet, createBucket(100, 10));
+        buckets.put(Endpoints.getWalletTxns, createBucket(100, 10));
         buckets.put("/", createBucket(100, 10));
         return buckets;
     }
