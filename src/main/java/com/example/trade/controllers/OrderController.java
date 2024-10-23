@@ -21,7 +21,12 @@ public class OrderController {
 
     @PostMapping(Endpoints.buyOrder)
     ResponseEntity<String> buyOrder(@RequestParam String coinId, @RequestParam BigDecimal amount) throws Exception {
-        Orders order = orderService.buyOrder(coinId, amount);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        try {
+            Orders order = orderService.buyOrder(coinId, amount);
+            return new ResponseEntity<>("Success", HttpStatus.OK);
+        } catch (Exception e) {
+            orderService.createFailedOrder(coinId, amount);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

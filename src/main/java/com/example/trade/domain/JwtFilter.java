@@ -54,7 +54,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
+
             if (authorization != null) {
+                System.out.println("Authorization is valid " + url);
                 String token = authorization.substring(7);
                 String email = jwtUtility.extractUsername(token);
                 User fetchedUser = userRepository.findByEmail(email);

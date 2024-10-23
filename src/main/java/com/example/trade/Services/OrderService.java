@@ -47,6 +47,7 @@ public class OrderService {
         order.setTxnPrice(txnPrice);
         order.setQuantity(quantity);
         order.setRemQty(remQty);
+        ordersRepository.save(order);
         return order;
     }
 
@@ -84,5 +85,12 @@ public class OrderService {
             holdingRepository.save(holdings);
         }
         return order;
+    }
+
+    public Orders createFailedOrder(String coinId, BigDecimal amount) throws JsonProcessingException {
+        User user = userService.getUser();
+        double price = coinService.getCoinLatestPrize(coinId);
+        BigDecimal qty = amount.divide(BigDecimal.valueOf(price), 3);
+        return createOrder(user, OrderType.buy, coinId, qty, qty, amount, OrderStatus.failed);
     }
 }
