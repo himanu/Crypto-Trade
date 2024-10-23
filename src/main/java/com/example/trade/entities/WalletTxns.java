@@ -1,5 +1,6 @@
 package com.example.trade.entities;
 
+import com.example.trade.domain.OrderStatus;
 import com.example.trade.domain.WalletTxnType;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -22,7 +23,16 @@ public class WalletTxns {
 
     LocalDateTime localDateTime = LocalDateTime.now();
 
+    @Enumerated(EnumType.STRING)
+    OrderStatus status;
+
     String orderId;
 
     BigDecimal amount;
+
+    String depositWithdrawOrderId;
+
+    String razorpayOrderId;
+
+    String razorpayPaymentId;
 }

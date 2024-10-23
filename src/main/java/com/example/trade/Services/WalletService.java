@@ -1,5 +1,6 @@
 package com.example.trade.Services;
 
+import com.example.trade.domain.OrderStatus;
 import com.example.trade.domain.WalletTxnType;
 import com.example.trade.entities.User;
 import com.example.trade.entities.Wallet;
@@ -12,8 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class WalletService {
@@ -37,21 +40,20 @@ public class WalletService {
         return walletRepository.save(wallet);
     }
 
-    void addFunds(BigDecimal amount, User user, WalletTxnType walletTxnType, String orderId) {
+    public void addFunds(BigDecimal amount, User user) {
         Wallet wallet = walletRepository.findByUser(user);
         BigDecimal currentBalance = wallet.getBalance();
         wallet.setBalance(currentBalance.add(amount));
         walletRepository.save(wallet);
-        createWalletTxn(wallet, walletTxnType, amount, orderId);
     }
 
     @Transactional
-    public void addMoney(BigDecimal amount) {
-        User user = userService.getUser();
-        addFunds(amount, user, WalletTxnType.add_funds, null);
+    public void initiateDeposit(BigDecimal amount, User user, String depositOrderId) {
+        Wallet wallet = walletRepository.findByUser(user);
+        createWalletTxn(wallet, WalletTxnType.add_funds, amount, null, depositOrderId, OrderStatus.pending);
     }
 
-    void deductFunds(BigDecimal amount, User user, WalletTxnType walletTxnType, String orderId) {
+    Wallet deductFunds(BigDecimal amount, User user, WalletTxnType walletTxnType, String orderId) {
         Wallet wallet = walletRepository.findByUser(user);
         BigDecimal currentBalance = getUserBalance(user);
         if (currentBalance.compareTo(amount) < 0) {
@@ -59,15 +61,18 @@ public class WalletService {
         }
         wallet.setBalance(currentBalance.subtract(amount));
         walletRepository.save(wallet);
-        createWalletTxn(wallet, walletTxnType, amount, orderId);
+        createWalletTxn(wallet, walletTxnType, amount.multiply(BigDecimal.valueOf(-1)), orderId, null, OrderStatus.succeed);
+        return wallet;
     }
 
-    void createWalletTxn(Wallet wallet, WalletTxnType walletTxnType, BigDecimal amount, String orderId) {
+    void createWalletTxn(Wallet wallet, WalletTxnType walletTxnType, BigDecimal amount, String orderId, String depositOrderId, OrderStatus orderStatus) {
         WalletTxns walletTxns = new WalletTxns();
         walletTxns.setWalletTxnType(walletTxnType);
         walletTxns.setAmount(amount);
         walletTxns.setOrderId(orderId);
         walletTxns.setWallet(wallet);
+        walletTxns.setDepositWithdrawOrderId(depositOrderId);
+        walletTxns.setStatus(orderStatus);
         walletTxnRepository.save(walletTxns);
     }
 
@@ -75,9 +80,29 @@ public class WalletService {
         return walletRepository.findByUser(user);
     }
 
+    public WalletTxns updateWalletTxnStatus(String orderId, OrderStatus orderStatus, String rzOrderId, String rzPaymentId) {
+        Optional<WalletTxns> walletTxns = walletTxnRepository.findByDepositWithdrawOrderId(orderId);
+        if (walletTxns.isEmpty())
+            return null;
+        WalletTxns walletTxns1 = walletTxns.get();
+        walletTxns1.setStatus(orderStatus);
+        walletTxns1.setRazorpayOrderId(rzOrderId);
+        walletTxns1.setRazorpayPaymentId(rzPaymentId);
+        return walletTxnRepository.save(walletTxns1);
+    }
+
+    public Wallet withDrawFunds(BigDecimal amount) throws Exception {
+        User user = userService.getUser();
+        return deductFunds(amount, user, WalletTxnType.withdraw_funds, null);
+    }
+
     public List<WalletTxns> getWalletTxns(User user) {
         Wallet wallet = getUserWallet(user);
-        return walletTxnRepository.findByWallet(wallet);
+        List<WalletTxns> txns =  walletTxnRepository.findByWallet(wallet);
+        return txns.stream()
+                .filter(txn -> OrderStatus.succeed.equals(txn.getStatus()))
+                .sorted(Comparator.comparing(WalletTxns::getLocalDateTime).reversed()) // Adjust the method name as needed
+                .collect(Collectors.toList());
     }
 
 }

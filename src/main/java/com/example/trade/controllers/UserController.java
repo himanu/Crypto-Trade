@@ -77,6 +77,7 @@ public class UserController {
             String jwtToken = jwtUtility.generateToken(email);
             Map<String, Object> response = new HashMap<>();
             response.put("token", jwtToken);
+            response.put("user", fetchedUser);
             response.put("message", "Signed in successfully!");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }

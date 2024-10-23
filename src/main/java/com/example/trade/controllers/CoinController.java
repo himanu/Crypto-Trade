@@ -67,4 +67,12 @@ public class CoinController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping(Endpoints.topLosers)
+    ResponseEntity<JsonNode> getTopLosers() throws JsonProcessingException {
+        String marketData = coinService.getTrendingCoins();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode response = objectMapper.readTree(marketData);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

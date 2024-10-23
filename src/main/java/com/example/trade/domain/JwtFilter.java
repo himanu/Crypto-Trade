@@ -75,6 +75,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         String jsonResponse = objectMapper.writeValueAsString(errorMessage);
                         response.getWriter().write(jsonResponse);
                     }
+                    System.out.println("Request Completed");
                     return;
                 }
             }

@@ -19,14 +19,9 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
-    @PostMapping(Endpoints.createOrder)
-    ResponseEntity<String> createOrder(@RequestBody CreateOrderReq createOrderReq) throws JsonProcessingException {
-        if (createOrderReq.orderType == OrderType.buy) {
-            Orders order = orderService.buyOrder(createOrderReq.coinId, BigDecimal.valueOf(createOrderReq.qty));
-            if (order.getOrderStatus() == OrderStatus.failed) {
-                return new ResponseEntity<>("Order failed! " + order.getRemark(), HttpStatus.NOT_ACCEPTABLE);
-            }
-        }
+    @PostMapping(Endpoints.buyOrder)
+    ResponseEntity<String> buyOrder(@RequestParam String coinId, @RequestParam BigDecimal amount) throws Exception {
+        Orders order = orderService.buyOrder(coinId, amount);
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 }

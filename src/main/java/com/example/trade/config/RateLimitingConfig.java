@@ -31,7 +31,11 @@ public class RateLimitingConfig {
         buckets.put(Endpoints.searchCoin, createBucket(100, 10));
         buckets.put(Endpoints.trendingCoins, createBucket(100, 10));
         buckets.put(Endpoints.top50Coin, createBucket(100, 10));
+        buckets.put(Endpoints.topLosers, createBucket(100, 10));
+        buckets.put(Endpoints.topGainers, createBucket(100, 10));
         buckets.put(Endpoints.createOrder, createBucket(100, 10));
+        buckets.put(Endpoints.buyOrder, createBucket(100, 10));
+        buckets.put(Endpoints.sellOrder, createBucket(100, 10));
         buckets.put(Endpoints.orderHistory, createBucket(100, 10));
         buckets.put(Endpoints.getPortfolio, createBucket(100, 10));
         buckets.put(Endpoints.addMoney, createBucket(100, 10));
@@ -40,6 +44,8 @@ public class RateLimitingConfig {
         buckets.put(Endpoints.createWallet, createBucket(100, 10));
         buckets.put(Endpoints.getWallet, createBucket(100, 10));
         buckets.put(Endpoints.getWalletTxns, createBucket(100, 10));
+        buckets.put(Endpoints.initiateDeposit, createBucket(100, 10));
+        buckets.put(Endpoints.verifyDeposit, createBucket(100, 10));
         buckets.put("/", createBucket(100, 10));
         return buckets;
     }

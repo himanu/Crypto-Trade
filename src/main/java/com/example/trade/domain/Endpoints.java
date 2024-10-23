@@ -17,6 +17,10 @@ public class Endpoints {
     public static final String searchCoin = "/coin/search";
     public static final String top50Coin = "/coin/top50";
     public static final String trendingCoins = "/coin/trending";
+    public static final String topLosers = "/coin/top_losers";
+    public static final String topGainers = "/coin/top_gainers";
+    public static final String buyOrder = "/order/buy";
+    public static final String sellOrder = "/order/sell";
     public static final String createOrder = "/order/create";
     public static final String orderHistory = "/order/history";
     public static final String getPortfolio = "/portfolio";
@@ -26,6 +30,8 @@ public class Endpoints {
     public static final String createWallet = "/wallet/create";
     public static final String getWallet = "/wallet";
     public static final String getWalletTxns = "/wallet/txns";
+    public static final String initiateDeposit = "/wallet/deposit/init";
+    public static final String verifyDeposit = "/wallet/deposit/verify";
     public static final String helloWorld = "/";
     public static  Map<String, Boolean> privateEndpoint = new HashMap<>();
 
@@ -43,6 +49,8 @@ public class Endpoints {
         privateEndpoint.put(searchCoin, true);
         privateEndpoint.put(top50Coin, true);
         privateEndpoint.put(trendingCoins, true);
+        privateEndpoint.put(topGainers, true);
+        privateEndpoint.put(topLosers, true);
         privateEndpoint.put(createOrder, true);
         privateEndpoint.put(orderHistory, true);
         privateEndpoint.put(getPortfolio, true);
@@ -53,5 +61,9 @@ public class Endpoints {
         privateEndpoint.put(helloWorld, false);
         privateEndpoint.put(getWallet, true);
         privateEndpoint.put(getWalletTxns, true);
+        privateEndpoint.put(initiateDeposit, true);
+        privateEndpoint.put(verifyDeposit, true);
+        privateEndpoint.put(buyOrder, true);
+        privateEndpoint.put(sellOrder, true);
     }
 }

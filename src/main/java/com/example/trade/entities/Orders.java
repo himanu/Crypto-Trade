@@ -27,6 +27,8 @@ public class Orders {
 
     BigDecimal quantity;
 
+    BigDecimal remQty;
+
     BigDecimal txnPrice;
 
     @Enumerated(EnumType.STRING)

@@ -107,6 +107,16 @@ public class CoinServiceImpl implements CoinService{
         return coinsResponse.getBody();
     }
 
+    public String getTopLosers() throws JsonProcessingException {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.coingecko.com/api/v3/search/trending" + "?x_cg_demo_api_key=" + this.coin_gecko_api_key;
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("accept", "application/json");
+        HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
+        ResponseEntity<String> coinsResponse = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+        return coinsResponse.getBody();
+    }
+
     public double getCoinLatestPrize(String coinId) throws JsonProcessingException {
         String coinDetail = getCoinDetails(coinId);
         ObjectMapper objectMapper = new ObjectMapper();
