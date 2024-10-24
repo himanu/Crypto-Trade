@@ -96,10 +96,23 @@ public class OrderService {
         return order;
     }
 
-    public Orders createFailedOrder(String coinId, BigDecimal amount) throws JsonProcessingException {
+    @Transactional
+    public Orders sellOrder(String coinId, BigDecimal qty) throws Exception {
         User user = userService.getUser();
-        BigDecimal price = coinService.getCoinLatestPrize(coinId);
-        BigDecimal qty = BigDecimal.valueOf(amount.doubleValue()/price.doubleValue()).setScale(6, RoundingMode.HALF_UP);
-        return createOrder(user, OrderType.buy, coinId, qty, qty, price, OrderStatus.failed);
+        Holdings holdings = holdingRepository.findByUserAndCoinId(user, coinId);
+        if (holdings == null || holdings.getQty().compareTo(qty) < 0) {
+            throw new Exception("Insufficient Qty to sell");
+        }
+        Wallet wallet = walletService.getUserWallet(user);
+        Orders order = createOrder(user, OrderType.sell, coinId, qty, null, null, OrderStatus.succeed);
+        holdings.setQty(holdings.getQty().subtract(qty));
+        holdingRepository.save(holdings);
+        BigDecimal price = coinService.getCoinLatestPrize(coinId).setScale(6, RoundingMode.HALF_UP);
+        wallet.setBalance(wallet.getBalance().add(qty.multiply(price)));
+        return null;
+    }
+    public Orders createFailedOrder(String coinId, BigDecimal amount, BigDecimal qty, OrderType orderType) throws JsonProcessingException {
+        User user = userService.getUser();
+        return createOrder(user, orderType, coinId, qty, qty, null, OrderStatus.failed);
     }
 }
