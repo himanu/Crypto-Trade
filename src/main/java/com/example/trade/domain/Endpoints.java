@@ -23,7 +23,7 @@ public class Endpoints {
     public static final String sellOrder = "/order/sell";
     public static final String createOrder = "/order/create";
     public static final String orderHistory = "/order/history";
-    public static final String getPortfolio = "/portfolio";
+    public static final String getPortfolio = "get/portfolio";
     public static final String addMoney = "/wallet/add";
     public static final String withdrawMoney = "/wallet/withdraw";
     public static final String getBalance = "/wallet/balance";
@@ -32,6 +32,8 @@ public class Endpoints {
     public static final String getWalletTxns = "/wallet/txns";
     public static final String initiateDeposit = "/wallet/deposit/init";
     public static final String verifyDeposit = "/wallet/deposit/verify";
+    public static final String portfolio = "/portfolio";
+    public static final String activity = "/activity";
     public static final String helloWorld = "/";
     public static  Map<String, Boolean> privateEndpoint = new HashMap<>();
 
@@ -65,5 +67,7 @@ public class Endpoints {
         privateEndpoint.put(verifyDeposit, true);
         privateEndpoint.put(buyOrder, true);
         privateEndpoint.put(sellOrder, true);
+        privateEndpoint.put(portfolio, true);
+        privateEndpoint.put(activity, true);
     }
 }

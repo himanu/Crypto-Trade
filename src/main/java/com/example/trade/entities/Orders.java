@@ -25,8 +25,10 @@ public class Orders {
 
     LocalDateTime timeStamp = LocalDateTime.now();
 
+    @Column(precision = 10, scale = 6)
     BigDecimal quantity;
 
+    @Column(precision = 10, scale = 6)
     BigDecimal remQty;
 
     BigDecimal txnPrice;

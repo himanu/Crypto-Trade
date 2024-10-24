@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import org.springframework.http.HttpHeaders;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -117,10 +119,10 @@ public class CoinServiceImpl implements CoinService{
         return coinsResponse.getBody();
     }
 
-    public double getCoinLatestPrize(String coinId) throws JsonProcessingException {
+    public BigDecimal getCoinLatestPrize(String coinId) throws JsonProcessingException {
         String coinDetail = getCoinDetails(coinId);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode =  objectMapper.readTree(coinDetail);
-        return jsonNode.get("market_data").get("current_price").get("usd").asDouble();
+        return jsonNode.get("market_data").get("current_price").get("usd").decimalValue();
     }
 }

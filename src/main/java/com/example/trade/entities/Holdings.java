@@ -17,7 +17,9 @@ public class Holdings {
 
     String coinId;
 
-    BigDecimal txnValue;
+    @Column(precision = 10, scale = 6)
+    BigDecimal avgPrice;
 
+    @Column(precision = 10, scale = 6)
     BigDecimal qty;
 }
