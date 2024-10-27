@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -39,8 +40,7 @@ public class OrderService {
     @Autowired
     OrdersRepository ordersRepository;
 
-    private Orders createOrder(User user, OrderType orderType, String coinId, BigDecimal quantity, BigDecimal remQty, BigDecimal txnPrice, OrderStatus orderStatus) {
-        System.out.println(txnPrice);
+    private Orders createOrder(User user, OrderType orderType, String coinId, BigDecimal quantity, BigDecimal remQty, BigDecimal txnPrice, OrderStatus orderStatus, BigDecimal txnValue, String coinImg) {
         Orders order = new Orders();
         order.setOrderStatus(orderStatus);
         order.setOrderType(orderType);
@@ -49,6 +49,8 @@ public class OrderService {
         order.setTxnPrice(txnPrice);
         order.setQuantity(quantity);
         order.setRemQty(remQty);
+        order.setTxnValue(txnValue);
+        order.setCoinImg(coinImg);
         ordersRepository.save(order);
         return order;
     }
@@ -62,15 +64,20 @@ public class OrderService {
         if (amount.compareTo(wallet.getBalance()) > 0) {
             throw new Exception("InSufficient Balance");
         }
-        BigDecimal price = coinService.getCoinLatestPrize(coinId).setScale(6, RoundingMode.HALF_UP);
-
+        String coinDetail = coinService.getCoinDetails(coinId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode =  objectMapper.readTree(coinDetail);
+        BigDecimal price = jsonNode.get("market_data").get("current_price").get("usd").decimalValue().setScale(6, RoundingMode.HALF_UP);;
+        String coinImg = String.valueOf(jsonNode.get("image").get("thumb"));
+        String coinName = String.valueOf(jsonNode.get("name"));
+        System.out.println("coinImg " + coinImg + " coinId " + coinId);
         // calculate qty
         BigDecimal qty = BigDecimal.valueOf(amount.doubleValue()/price.doubleValue()).setScale(6, RoundingMode.HALF_UP);
         // create a buy order
         System.out.println("QTY " + qty + " price " + price);
-        Orders order = createOrder(user, OrderType.buy, coinId, qty, qty, price, OrderStatus.succeed);
+        Orders order = createOrder(user, OrderType.buy, coinId, qty, qty, price, OrderStatus.succeed, amount, coinImg);
         // update wallet
-        walletService.deductFunds(amount, user, WalletTxnType.bought_asset, String.valueOf(order.getId()));
+        walletService.deductFunds(amount, user, WalletTxnType.bought_asset, String.valueOf(order.getId()), coinName, coinImg);
         // create/update holding
         Holdings holdings = holdingRepository.findByUserAndCoinId(user, coinId);
         if (holdings == null) {
@@ -104,15 +111,28 @@ public class OrderService {
             throw new Exception("Insufficient Qty to sell");
         }
         Wallet wallet = walletService.getUserWallet(user);
-        Orders order = createOrder(user, OrderType.sell, coinId, qty, null, null, OrderStatus.succeed);
+        String coinDetail = coinService.getCoinDetails(coinId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode =  objectMapper.readTree(coinDetail);
+        BigDecimal price = jsonNode.get("market_data").get("current_price").get("usd").decimalValue().setScale(6, RoundingMode.HALF_UP);;
+        String coinImg = String.valueOf(jsonNode.get("image").get("thumb"));
+        String coinName = String.valueOf(jsonNode.get("name"));
+        BigDecimal txnValue = qty.multiply(price);
+        Orders order = createOrder(user, OrderType.sell, coinId, qty, null, price, OrderStatus.succeed, txnValue, coinImg);
         holdings.setQty(holdings.getQty().subtract(qty));
         holdingRepository.save(holdings);
-        BigDecimal price = coinService.getCoinLatestPrize(coinId).setScale(6, RoundingMode.HALF_UP);
-        wallet.setBalance(wallet.getBalance().add(qty.multiply(price)));
+        wallet.setBalance(wallet.getBalance().add(txnValue));
+        walletService.createWalletTxn(wallet, WalletTxnType.sold_asset, txnValue, String.valueOf(order.getId()), null, OrderStatus.succeed, coinName, coinImg);
         return null;
     }
     public Orders createFailedOrder(String coinId, BigDecimal amount, BigDecimal qty, OrderType orderType) throws JsonProcessingException {
         User user = userService.getUser();
-        return createOrder(user, orderType, coinId, qty, qty, null, OrderStatus.failed);
+        return createOrder(user, orderType, coinId, qty, qty, null, OrderStatus.failed, null, null);
+    }
+
+    public List<Orders> getOrderActivities() {
+        User user = userService.getUser();
+        return ordersRepository.findAllByUserAndOrderStatus(user, OrderStatus.succeed);
+
     }
 }

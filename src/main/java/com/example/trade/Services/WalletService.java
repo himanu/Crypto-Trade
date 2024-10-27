@@ -50,10 +50,10 @@ public class WalletService {
     @Transactional
     public void initiateDeposit(BigDecimal amount, User user, String depositOrderId) {
         Wallet wallet = walletRepository.findByUser(user);
-        createWalletTxn(wallet, WalletTxnType.add_funds, amount, null, depositOrderId, OrderStatus.pending);
+        createWalletTxn(wallet, WalletTxnType.add_funds, amount, null, depositOrderId, OrderStatus.pending, null, null);
     }
 
-    Wallet deductFunds(BigDecimal amount, User user, WalletTxnType walletTxnType, String orderId) {
+    Wallet deductFunds(BigDecimal amount, User user, WalletTxnType walletTxnType, String orderId, String coinName, String coinImg) {
         Wallet wallet = walletRepository.findByUser(user);
         BigDecimal currentBalance = getUserBalance(user);
         if (currentBalance.compareTo(amount) < 0) {
@@ -61,11 +61,11 @@ public class WalletService {
         }
         wallet.setBalance(currentBalance.subtract(amount));
         walletRepository.save(wallet);
-        createWalletTxn(wallet, walletTxnType, amount.multiply(BigDecimal.valueOf(-1)), orderId, null, OrderStatus.succeed);
+        createWalletTxn(wallet, walletTxnType, amount.multiply(BigDecimal.valueOf(-1)), orderId, null, OrderStatus.succeed, coinName, coinImg);
         return wallet;
     }
 
-    void createWalletTxn(Wallet wallet, WalletTxnType walletTxnType, BigDecimal amount, String orderId, String depositOrderId, OrderStatus orderStatus) {
+    void createWalletTxn(Wallet wallet, WalletTxnType walletTxnType, BigDecimal amount, String orderId, String depositOrderId, OrderStatus orderStatus, String coinName, String coinImg) {
         WalletTxns walletTxns = new WalletTxns();
         walletTxns.setWalletTxnType(walletTxnType);
         walletTxns.setAmount(amount);
@@ -73,6 +73,8 @@ public class WalletService {
         walletTxns.setWallet(wallet);
         walletTxns.setDepositWithdrawOrderId(depositOrderId);
         walletTxns.setStatus(orderStatus);
+        walletTxns.setCoinName(coinName);
+        walletTxns.setCoinImg(coinImg);
         walletTxnRepository.save(walletTxns);
     }
 
@@ -93,7 +95,7 @@ public class WalletService {
 
     public Wallet withDrawFunds(BigDecimal amount) throws Exception {
         User user = userService.getUser();
-        return deductFunds(amount, user, WalletTxnType.withdraw_funds, null);
+        return deductFunds(amount, user, WalletTxnType.withdraw_funds, null, null, null);
     }
 
     public List<WalletTxns> getWalletTxns(User user) {

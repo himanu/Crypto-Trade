@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 @Service
 public class HoldingService {
     @Autowired UserService userService;
@@ -27,19 +27,20 @@ public class HoldingService {
     public List<Map<String, Object>> getHoldings() throws JsonProcessingException {
         User user = userService.getUser();
         List<Map<String, Object>> response = new ArrayList<>();
-        List<Holdings> holdings = holdingRepository.findAllByUser(user);
+        List<Holdings> holdings = holdingRepository.findAllByUserAndQtyGreaterThan(user, BigDecimal.valueOf(0));
         for (Holdings holding: holdings) {
             String coinId = holding.getCoinId();
-//            String coinUrl = "https://coin-images.coingecko.com/coins/images/1/large/" + coinId + ".png";
 
             String marketData = coinService.getCoinDetails(coinId);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode res = objectMapper.readTree(marketData);
 
-            double currentValue = holding.getQty().multiply(coinService.getCoinLatestPrize(coinId)).doubleValue();
-            double investedValue = holding.getQty().doubleValue() * holding.getAvgPrice().doubleValue();
+            double qty = holding.getQty().doubleValue();
+            double currentPrice = res.get("market_data").get("current_price").get("usd").doubleValue();
+            double currentValue = qty * currentPrice;
+            double investedValue = qty * holding.getAvgPrice().doubleValue();
             double returnValue = (currentValue - investedValue);
-            double returnValuePercentage = (returnValue/investedValue)*100;
+            double returnValuePercentage = investedValue == 0 ? 0 : (returnValue/investedValue)*100;
             Map<String, Object> map = new HashMap<>();
             map.put("holding", holding);
             map.put("coinUrl", res.get("image").get("small"));
@@ -47,6 +48,10 @@ public class HoldingService {
             map.put("currentValue", currentValue);
             map.put("returnValue", returnValue);
             map.put("returnValuePercentage", returnValuePercentage);
+            map.put("coinSymbol", res.get("symbol"));
+            map.put("coinPrice", currentPrice);
+            map.put("coinPriceChange", res.get("market_data").get("price_change_24h"));
+            map.put("coinPriceChangePercentage", res.get("market_data").get("price_change_percentage_24h"));
 
             response.add(map);
         }

@@ -40,4 +40,9 @@ public class OrderController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping(Endpoints.activity)
+    Object getOrderActivity() {
+        return orderService.getOrderActivities();
+    }
 }

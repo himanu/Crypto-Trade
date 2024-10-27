@@ -35,4 +35,8 @@ public class WalletTxns {
     String razorpayOrderId;
 
     String razorpayPaymentId;
+
+    String coinName;
+
+    String coinImg;
 }

@@ -2,6 +2,7 @@ package com.example.trade.entities;
 
 import com.example.trade.domain.OrderStatus;
 import com.example.trade.domain.OrderType;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,6 +24,8 @@ public class Orders {
 
     String coinId;
 
+    String coinImg;
+
     LocalDateTime timeStamp = LocalDateTime.now();
 
     @Column(precision = 10, scale = 6)
@@ -33,6 +36,7 @@ public class Orders {
 
     BigDecimal txnPrice;
 
+    BigDecimal txnValue;
     @Enumerated(EnumType.STRING)
     OrderStatus orderStatus;
 
