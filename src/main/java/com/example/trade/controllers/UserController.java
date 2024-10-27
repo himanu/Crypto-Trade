@@ -72,7 +72,10 @@ public class UserController {
 
                 this.sendEmail(email, "OTP to login to your account", "Your OTP is \n" + savedOTP.getOtp());
                 System.out.println("2FA Enabled");
-                return new ResponseEntity<>("Sent OTP", HttpStatus.OK);
+                Map<String, Object> response = new HashMap<>();
+                response.put("is2FAEnabled", true);
+                response.put("isOTPSent", true);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             }
             String jwtToken = jwtUtility.generateToken(email);
             Map<String, Object> response = new HashMap<>();
@@ -144,7 +147,7 @@ public class UserController {
         twoFactorAuth.setSendTo(VERIFICATION_TYPE.EMAIL);
         user.setTwoFactorAuth(twoFactorAuth);
         userRepository.save(user);
-        return new ResponseEntity<>("Enabled Two Factor Auth", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(user, HttpStatus.ACCEPTED);
     }
 
     @PostMapping(Endpoints.otpVerify)
@@ -152,7 +155,7 @@ public class UserController {
         User fetchedUser = userRepository.findByEmail(email);
         Optional<OTPs> fetchedOTP = otPsRepository.findByUserAndOtpType(fetchedUser, OTPType.LOGIN);
         if (fetchedOTP.isEmpty()) {
-            return new ResponseEntity<>("Please login again using Email and Password", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
         }
         OTPs fetchedOTP1 = fetchedOTP.get();
         if (new Date().after(fetchedOTP1.getExpiryDate())) {
@@ -162,6 +165,7 @@ public class UserController {
             String jwtToken = jwtUtility.generateToken(email);
             Map<String, Object> response = new HashMap<>();
             response.put("token", jwtToken);
+            response.put("user", fetchedUser);
             response.put("message", "Signed in successfully!");
             otPsRepository.deleteById(fetchedOTP1.getId());
             return new ResponseEntity<>(response, HttpStatus.OK);
