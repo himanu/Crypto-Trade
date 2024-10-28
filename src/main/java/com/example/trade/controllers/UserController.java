@@ -116,25 +116,29 @@ public class UserController {
 
     @PostMapping(Endpoints.signup)
     ResponseEntity<Object> signup(@RequestBody User user) throws Exception {
-        String email = user.getEmail();
-        String password = user.getPassword();
-        String username = user.getUsername();
+        try {
+            String email = user.getEmail();
+            String password = user.getPassword();
+            String username = user.getUsername();
 
-        if (email == null || password == null || username == null) {
-            return new ResponseEntity<>("Missing required credentials", HttpStatus.BAD_REQUEST);
-        }
-        User isUserExist = userRepository.findByEmail(email);
-        if (isUserExist != null) {
-            return new ResponseEntity<>("User already exist", HttpStatus.BAD_REQUEST);
-        }
+            if (email == null || password == null || username == null) {
+                return new ResponseEntity<>("Missing required credentials", HttpStatus.BAD_REQUEST);
+            }
+            User isUserExist = userRepository.findByEmail(email);
+            if (isUserExist != null) {
+                return new ResponseEntity<>("User already exist with this email", HttpStatus.BAD_REQUEST);
+            }
 
-        User newUser = new User();
-        newUser.setEmail(email);
-        newUser.setPassword(passwordEncoder.encode(password));
-        newUser.setUsername(username);
-        User savedUser = userRepository.save(newUser);
-        walletService.createWallet(savedUser);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setPassword(passwordEncoder.encode(password));
+            newUser.setUsername(username);
+            User savedUser = userRepository.save(newUser);
+            walletService.createWallet(savedUser);
+            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping(Endpoints.enable2FA)

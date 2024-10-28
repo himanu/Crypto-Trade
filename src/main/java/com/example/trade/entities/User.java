@@ -15,7 +15,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment primary key
     private Long id;
 
-    @Column(name = "username", nullable = false, unique = true) // Maps to "username" column
+    @Column(name = "username", nullable = false) // Maps to "username" column
     private String username;
 
     @Column(name = "password", nullable = false) // Maps to "password" column
