@@ -19,9 +19,9 @@ import com.razorpay.RazorpayException;
 import com.razorpay.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -118,6 +118,15 @@ public class WalletController {
 
     @GetMapping(Endpoints.getWalletTxns)
     ResponseEntity<List<WalletTxns>> getWalletTxns() {
+
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.coindesk.com/v1/bpi/currentprice.json";
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("accept", "application/json");
+        HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
+
+        ResponseEntity<String> coinsResponse = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+        System.out.println("coinsResponse" + coinsResponse);
         User user = userService.getUser();
         List<WalletTxns> txns = walletService.getWalletTxns(user);
         return new ResponseEntity<>(txns, HttpStatus.OK);
