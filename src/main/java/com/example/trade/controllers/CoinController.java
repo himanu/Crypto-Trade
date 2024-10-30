@@ -22,9 +22,14 @@ public class CoinController {
     CoinServiceImpl coinService;
 
     @GetMapping(Endpoints.getCoins)
-    ResponseEntity<List<Coin>> getCoins(@RequestParam int page) throws JsonProcessingException {
-        List<Coin> coins = coinService.getCoinList(page);
-        return new ResponseEntity<>(coins, HttpStatus.ACCEPTED);
+    ResponseEntity<Object> getCoins(@RequestParam int page) throws JsonProcessingException {
+        try {
+            List<Coin> coins = coinService.getCoinList(page);
+            return new ResponseEntity<>(coins, HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            System.out.println(e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(Endpoints.getMarketChart)
