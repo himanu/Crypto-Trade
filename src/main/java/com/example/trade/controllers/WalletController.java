@@ -120,7 +120,7 @@ public class WalletController {
     ResponseEntity<List<WalletTxns>> getWalletTxns() {
 
         RestTemplate restTemplate = new RestTemplate();
-        String url = "https://api.coindesk.com/v1/bpi/currentprice.json";
+        String url = "https://api.coingecko.com/api/v3/ping";
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("accept", "application/json");
         HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
