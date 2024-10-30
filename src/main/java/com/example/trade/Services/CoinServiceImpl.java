@@ -36,10 +36,11 @@ public class CoinServiceImpl implements CoinService{
     public List<Coin> getCoinList(int page) throws JsonProcessingException {
 
         RestTemplate restTemplate = new RestTemplate();
-        String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=20&page=" + page + "&x_cg_demo_api_key=" + this.coin_gecko_api_key;
+        String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=20&page=" + page;
         System.out.println("url " + url);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("accept", "application/json");
+        httpHeaders.add("x_cg_demo_api_key", this.coin_gecko_api_key);
         HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
 
         ResponseEntity<String> coinsResponse = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
