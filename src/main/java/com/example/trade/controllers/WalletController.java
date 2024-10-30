@@ -123,7 +123,7 @@ public class WalletController {
         String url = "https://api.coingecko.com/api/v3/ping";
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("accept", "application/json");
-        httpHeaders.add("user-agent", "C");
+        httpHeaders.add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64)");
         HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
 
         ResponseEntity<String> coinsResponse = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
