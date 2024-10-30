@@ -37,7 +37,7 @@ public class CoinServiceImpl implements CoinService{
 
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=20&page=" + page + "&x_cg_demo_api_key=" + this.coin_gecko_api_key;
-
+        System.out.println("url " + url);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("accept", "application/json");
         HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
